@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>search_image</title>
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Hind:400,600|Open+Sans:300,600" rel="stylesheet">
+    <link rel="stylesheet" href="./isolde.css">
+    <script type="text/JavaScript" src="js/jquery3-3-1.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/JavaScript" src="./assets/js/sortable.min.js"></script>
+    <script type="text/javascript" src="isolde.js"></script>
+</head>
+<body>
+<header>
+    <nav>
+        <div class="pull-left">
+            <ul>
+                <li class="logo"><img src="image/logo.png"></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <div class="search-form">
+            <div id="searchForm">
+                <div class="search-text">
+                    <input type="text" maxlength="100" id="searchContent">
+                </div>
+                <!--<div id="dd" class="wrapper-dropdown-3" tabindex="1">-->
+                    <!--<span>type</span>-->
+                    <!--<ul class="dropdown" style="z-index:99">-->
+                        <!--<li><a href="#"><i class="icon-large"></i>lucene</a></li>-->
+                        <!--<li><a href="#"><i class="icon-large"></i>mapreduce</a></li>-->
+                    <!--</ul>-->
+                <!--</div>-->
+                <div class="search-btn">
+                    <button id="searchBtn">搜索</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="wrapper">
+            <div id="isolde" class="isolde-default">
+                <!--<div data-isolde-el="flatty">-->
+                    <!--<div class="card">-->
+                        <!--<img class="card__picture" src="./assets/images/item-1.jpg" alt="">-->
+                        <!--<div class="card-infos">-->
+                            <!--<h2 class="card__title">祝大家新年快乐</h2>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+</main>
+
+<!--<script>-->
+    <!--var isoldejs = new isolde();-->
+<!--</script>-->
+<script type="text/javascript">
+    var str = '';
+    $(document).on('click','.search-btn', function () {
+        document.getElementById('isolde').innerHTML='';
+        if(!str){
+            str = 'lucene';
+        }
+        var keyword = document.getElementById("searchContent").value;
+        $.ajax({
+            async:true,
+            type: 'post',
+            url: 'php/search.php',
+            data: {
+                key: keyword,
+                opt:str
+            },
+            dataType: 'json',
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert('连接错误：' + textStatus + errorThrown);
+            },   //如果请求出错，弹出错误提示
+            success: function (data) {
+
+                console.log(data);
+                console.log(data[3]);
+                for (var i = 1; i <= 25; i++) {
+                    $('#isolde').append('<div data-isolde-el="flatty" style="opacity:1;"><div class="card"><img class="card__picture" src="'+data[i].image_path+'" alt="" title="'+'data[i].image_path'+
+                        '"><div class="card-infos"></div></div></div>');
+                    //$('#isolde').append('<div data-isolde-el="funny" style="opacity:1; display=block"><div class="card"><img class="card__picture" src="./assets/images/item-9.jpg" alt="" title="./assets/images/item-9.jpg"><div class="card-infos"><p >score: 9</p><p class="card__text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur adipisci voluptatum laborum officiis...</p></div></div></div>')
+
+                }
+                // console.log($('#isolde'));
+                //alert("kuku")
+                var newis = new isolde();
+                newis.flash();
+                document.querySelector('#isolde').sortablejs();
+
+            }
+        })
+
+    });
+
+
+    function DropDown(el) {
+        this.dd = el;
+        this.placeholder = this.dd.children('span');
+        this.opts = this.dd.find('ul.dropdown > li');
+        this.val = '';
+        this.index = -1;
+        this.initEvents();
+    }
+    DropDown.prototype = {
+        initEvents : function() {
+            var obj = this;
+
+            obj.dd.on('click', function(event){
+                $(this).toggleClass('active');
+                return false;
+            });
+
+            obj.opts.on('click',function(){
+                var opt = $(this);
+                obj.val = opt.text();
+                obj.index = opt.index();
+                obj.placeholder.text(obj.val);
+                str = obj.val;
+            });
+        },
+        getValue : function() {
+            console.log(this);
+            return this.val;
+        },
+        getIndex : function() {
+            return this.index;
+        }
+    }
+
+    $(function() {
+
+        var dd = new DropDown( $('#dd') );
+
+        $(document).click(function() {
+            // all dropdowns
+            $('.wrapper-dropdown-3').removeClass('active');
+        });
+
+    });
+
+</script>
+
+<script>document.querySelector('#isolde').sortablejs();</script>
+</body>
+</html>
